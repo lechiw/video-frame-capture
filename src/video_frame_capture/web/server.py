@@ -22,6 +22,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
 import uvicorn
+from contextlib import asynccontextmanager
 
 from ..core.video_parser import VideoParser
 from ..core.frame_selector import FrameSelector
@@ -42,38 +43,37 @@ CLEANUP_INTERVAL = 3600
 # 文件最大保留时间（秒）
 MAX_FILE_AGE = 7200
 
+# 临时存储管理
+_UPLOAD_DIR: Optional[Path] = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """管理应用生命周期"""
+    global _UPLOAD_DIR
+    # startup
+    _UPLOAD_DIR = Path(tempfile.mkdtemp(prefix="vfc_uploads_"))
+    _UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    print(f"📁 上传目录: {_UPLOAD_DIR}")
+    yield
+    # shutdown
+    if _UPLOAD_DIR and _UPLOAD_DIR.exists():
+        import shutil
+        shutil.rmtree(_UPLOAD_DIR, ignore_errors=True)
+        print(f"🧹 已清理: {_UPLOAD_DIR}")
+
+
 # ── FastAPI ──
 
 app = FastAPI(
     title="Video Frame Capture",
     description="浏览器端视频帧提取工具",
     version=__version__,
+    lifespan=lifespan,
 )
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
-
-# 临时存储管理
-_UPLOAD_DIR: Optional[Path] = None
-
-# ── 启动 / 关闭事件 ──
-
-
-@app.on_event("startup")
-async def startup():
-    global _UPLOAD_DIR
-    _UPLOAD_DIR = Path(tempfile.mkdtemp(prefix="vfc_uploads_"))
-    _UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"📁 上传目录: {_UPLOAD_DIR}")
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    """清理临时文件"""
-    if _UPLOAD_DIR and _UPLOAD_DIR.exists():
-        import shutil
-        shutil.rmtree(_UPLOAD_DIR, ignore_errors=True)
-        print(f"🧹 已清理: {_UPLOAD_DIR}")
 
 # ── 辅助函数 ──
 
@@ -105,8 +105,9 @@ def _cleanup_old_files():
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(
+        request,
         "index.html",
-        {"request": request, "version": __version__},
+        {"version": __version__},
     )
 
 # ── API 路由 ──
