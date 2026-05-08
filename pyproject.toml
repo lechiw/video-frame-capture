@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "video-frame-capture"
-version = "0.1.0"
+version = "0.1.1"
 description = "视频帧截取工具 - 从视频中预览并提取静态图片"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -12,7 +12,7 @@ license = {text = "MIT"}
 authors = [
     {name = "Developer"}
 ]
-keywords = ["video", "frame", "capture", "ffmpeg", "pyqt"]
+keywords = ["video", "frame", "capture", "ffmpeg", "pyqt", "cli"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: End Users/Desktop",
@@ -21,7 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Multimedia :: Video",
-    "Topic :: Multimedia :: Graphics :: Capture",
+    "Topic :: Utilities",
 ]
 
 dependencies = [
@@ -40,10 +40,11 @@ dev = [
 ]
 
 [project.scripts]
-video-frame-capture = "video_frame_capture.__main__:main"
+vfc-gui = "video_frame_capture.__main__:main"
+vfc = "video_frame_capture.cli.app:main"
 
 [project.gui-scripts]
-video-frame-capture-gui = "video_frame_capture.__main__:main"
+video-frame-capture = "video_frame_capture.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
