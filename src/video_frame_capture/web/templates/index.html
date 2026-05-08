@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}视频帧截取工具 — Web 版{% endblock %}
+
+{% block content %}
+
+<!-- 第一步：上传 -->
+<section id="step-upload" class="card">
+    <h2>📤 上传视频</h2>
+    <div class="upload-zone" id="uploadZone">
+        <p>拖拽视频文件到此处，或点击选择</p>
+        <p class="hint">支持 MP4 / AVI / MKV / MOV / WMV / FLV / WebM</p>
+        <input type="file" id="fileInput" accept=".mp4,.avi,.mkv,.mov,.wmv,.flv,.webm" hidden>
+        <button class="btn" id="selectFileBtn">选择视频文件</button>
+    </div>
+    <div id="uploadProgress" class="progress-bar hidden">
+        <div class="progress-fill"></div>
+    </div>
+</section>
+
+<!-- 第二步：视频信息 & 预览 -->
+<section id="step-preview" class="card hidden">
+    <h2>📹 视频信息</h2>
+    <div id="videoInfo" class="info-grid"></div>
+    <div class="video-container">
+        <video id="videoPlayer" controls preload="metadata"></video>
+    </div>
+</section>
+
+<!-- 第三步：提取设置 -->
+<section id="step-extract" class="card hidden">
+    <h2>⚙️ 提取设置</h2>
+    <form id="extractForm">
+        <input type="hidden" id="filePath" name="file_path">
+
+        <div class="form-row">
+            <label>模式</label>
+            <select name="mode" id="modeSelect">
+                <option value="interval">⏱ 按间隔提取</option>
+                <option value="custom">📌 指定时间戳</option>
+            </select>
+        </div>
+
+        <!-- 按间隔 -->
+        <div id="intervalSettings">
+            <div class="form-row">
+                <label>间隔（秒）</label>
+                <input type="number" name="interval" value="1" min="0.1" step="0.1">
+            </div>
+            <div class="form-row">
+                <label>起始（秒）</label>
+                <input type="number" name="start_time" id="startTime" value="0" min="0" step="0.1">
+            </div>
+            <div class="form-row">
+                <label>结束（秒）</label>
+                <input type="number" name="end_time" id="endTime" step="0.1">
+            </div>
+        </div>
+
+        <!-- 自定义时间戳 -->
+        <div id="customSettings" class="hidden">
+            <div class="form-row">
+                <label>时间戳（每行一个，支持 HH:MM:SS 或秒数）</label>
+                <textarea name="timestamps_input" rows="4" placeholder="00:00:00&#10;00:00:05&#10;00:00:10"></textarea>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>格式</label>
+            <select name="output_format">
+                <option value="png">PNG（无损）</option>
+                <option value="jpg">JPEG（有损）</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>质量</label>
+            <div class="slider-group">
+                <input type="range" name="quality" min="1" max="100" value="85">
+                <span id="qualityValue">85</span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>缩放（可选）</label>
+            <div class="scale-group">
+                <input type="number" name="width" placeholder="宽" min="1" step="1">
+                <span>×</span>
+                <input type="number" name="height" placeholder="高" min="1" step="1">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="extractBtn">
+            🔄 提取帧
+        </button>
+    </form>
+</section>
+
+<!-- 进度 & 结果 -->
+<section id="step-result" class="card hidden">
+    <h2 id="resultTitle">⏳ 正在提取...</h2>
+    <div id="extractProgress" class="progress-bar">
+        <div class="progress-fill" id="extractProgressFill"></div>
+    </div>
+    <p id="extractStatus" class="status-text"></p>
+    <div id="resultActions" class="hidden">
+        <a id="downloadLink" class="btn btn-primary">⬇️ 下载 ZIP</a>
+        <button class="btn" onclick="resetAll()">🔄 继续提取</button>
+    </div>
+    <div id="resultError" class="hidden error-box"></div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/app.js"></script>
+{% endblock %}

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "video-frame-capture"
-version = "0.1.1"
+version = "0.2.0"
 description = "视频帧截取工具 - 从视频中预览并提取静态图片"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -30,6 +30,11 @@ dependencies = [
     "imageio[ffmpeg]>=2.31.0",
     "Pillow>=10.0.0",
     "numpy>=1.24.0",
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
+    "jinja2>=3.1.0",
+    "python-multipart>=0.0.9",
+    "aiofiles>=23.0.0",
 ]
 
 [project.optional-dependencies]
@@ -42,6 +47,7 @@ dev = [
 [project.scripts]
 vfc-gui = "video_frame_capture.__main__:main"
 vfc = "video_frame_capture.cli.app:main"
+vfc-web = "video_frame_capture.web.server:main"
 
 [project.gui-scripts]
 video-frame-capture = "video_frame_capture.__main__:main"

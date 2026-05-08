@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}视频帧截取工具{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1><a href="/">🎬 视频帧截取工具</a></h1>
+        <span class="version">v{{ version }}</span>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>使用 ffmpeg+OpenCV 高效提取视频帧 · 
+           <a href="https://github.com/lechiw/video-frame-capture" target="_blank">GitHub</a></p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
